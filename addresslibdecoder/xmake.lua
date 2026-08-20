@@ -1,9 +1,9 @@
-target("commonlibf4-addresslibdecoder")
+target("ckpe-addresslibdecoder")
     -- set build by default
     set_default(false)
 
     -- set build group
-    set_group("commonlibf4/tool")
+    set_group("tools")
     
     -- add packages
     add_packages("rsm-mmio")

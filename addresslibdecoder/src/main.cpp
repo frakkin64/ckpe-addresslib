@@ -14,10 +14,21 @@
 
 using namespace std::literals;
 
+struct Header
+{
+	inline static constexpr std::uint32_t MAGICK = 0x434B414C;
+	inline static constexpr std::uint32_t CURRENT_VERSION = 0x1;
+
+	std::uint32_t magick{ MAGICK };
+	std::uint32_t version{ CURRENT_VERSION };
+	std::uint32_t crc32{ (std::uint32_t)-1 };
+	std::uint32_t count{ 0 };
+};
+
 struct Pair
 {
-	std::uint64_t id;
-	std::uint64_t offset;
+	std::uint32_t id;
+	std::uint32_t offset;
 };
 
 int main(int a_argc, char* a_argv[])
@@ -38,9 +49,10 @@ int main(int a_argc, char* a_argv[])
 				throw std::runtime_error("failed to open: "s + filename.string());
 			}
 
+			const Header* header = reinterpret_cast<const Header*>(input.data());
 			std::span data(
-				reinterpret_cast<const Pair*>(input.data() + sizeof(std::uint64_t)),
-				*reinterpret_cast<const std::uint64_t*>(input.data()));
+				reinterpret_cast<const Pair*>(input.data() + sizeof(Header)),
+				header->count);
 			if (!data.empty()) {
 				const auto width = std::format("{}", data.back().id);
 				const auto format = std::format("{{: >{}}}\t{{:0>7X}}\n", width.length());
